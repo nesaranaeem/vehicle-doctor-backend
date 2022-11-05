@@ -25,8 +25,22 @@ const run = async () => {
     app.get("/services", async (req, res) => {
       const query = {};
       const cursor = servicesCollection.find(query);
-      const services = await cursor.toArray();
+      const services = await cursor.limit(6).toArray();
       res.send(services);
+    });
+    //shop
+    app.get("/shop", async (req, res) => {
+      const query = {};
+      const page = parseInt(req.query.page);
+      const size = parseInt(req.query.size);
+      console.log(page, size);
+      const cursor = servicesCollection.find(query);
+      const services = await cursor
+        .skip(page * size)
+        .limit(size)
+        .toArray();
+      const count = await servicesCollection.estimatedDocumentCount();
+      res.send({ count, services });
     });
     app.get("/service/:id", async (req, res) => {
       const id = req.params.id;
